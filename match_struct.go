@@ -394,6 +394,7 @@ func init() {
 	guidePrice.prices = make(map[Symbol]decimal.Decimal)
 }
 
+//修改上一次成交价
 func PutGuidePrice(sym Symbol, price decimal.Decimal) {
 	guidePrice.Lock()
 	defer guidePrice.Unlock()
@@ -401,6 +402,7 @@ func PutGuidePrice(sym Symbol, price decimal.Decimal) {
 	guidePrice.prices[sym] = price
 }
 
+//获取上一次成交价
 func GetGuidePrice(sym Symbol) decimal.Decimal {
 	guidePrice.Lock()
 	defer guidePrice.Unlock()
