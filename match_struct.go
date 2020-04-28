@@ -23,7 +23,6 @@ type Symbol string
 
 //撮合订单
 type Order struct {
-	ID     uint64
 	Symbol Symbol
 	Price  decimal.Decimal
 	Amount decimal.Decimal

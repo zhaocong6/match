@@ -24,7 +24,6 @@ func TestNotExist_Error(t *testing.T) {
 func TestNotExist_Error2(t *testing.T) {
 	q := newTimeQueue()
 	q.push(&Order{
-		ID:     0,
 		Symbol: "",
 		Price:  decimal.Decimal{},
 		Amount: decimal.Decimal{},
@@ -52,7 +51,6 @@ func TestNewBuyQueue(t *testing.T) {
 
 	for i := 0; i < num; i++ {
 		err := q.push(&Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: decimal.NewFromInt(int64(i)),
@@ -87,7 +85,6 @@ func TestNewBuyQueue2(t *testing.T) {
 
 	for i := 0; i < num; i++ {
 		err := q.push(&Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromInt32(rand.Int31n(10)),
 			Amount: decimal.NewFromInt(int64(i)),
@@ -123,7 +120,6 @@ func TestNewSellQueue(t *testing.T) {
 
 	for i := 0; i < num; i++ {
 		err := q.push(&Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: decimal.NewFromInt(int64(i)),
@@ -158,7 +154,6 @@ func TestNewMarketQueue(t *testing.T) {
 
 	for i := 0; i < num; i++ {
 		q.push(&Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: decimal.NewFromInt(int64(i)),

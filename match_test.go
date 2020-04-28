@@ -34,7 +34,6 @@ func TestNewMatch1(t *testing.T) {
 		totalBuy = totalBuy.Add(a)
 
 		buys = append(buys, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: a,
@@ -49,7 +48,6 @@ func TestNewMatch1(t *testing.T) {
 		totalSell = totalSell.Add(a)
 
 		sells = append(sells, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: a,
@@ -124,7 +122,6 @@ func TestNewMatch2(t *testing.T) {
 		totalBuy = totalBuy.Add(a)
 
 		buys = append(buys, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.Decimal{},
 			Amount: a,
@@ -139,7 +136,6 @@ func TestNewMatch2(t *testing.T) {
 		totalSell = totalSell.Add(a)
 
 		sells = append(sells, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.Decimal{},
 			Amount: a,
@@ -212,7 +208,6 @@ func TestNewMatch3(t *testing.T) {
 		totalBuy = totalBuy.Add(a)
 
 		buys = append(buys, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.Decimal{},
 			Amount: a,
@@ -230,7 +225,6 @@ func TestNewMatch3(t *testing.T) {
 		totalSell = totalSell.Add(a)
 
 		sells = append(sells, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.Decimal{},
 			Amount: a,
@@ -300,7 +294,6 @@ func TestNewMatch4(t *testing.T) {
 		totalBuy = totalBuy.Add(a)
 
 		buys = append(buys, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: a,
@@ -316,7 +309,6 @@ func TestNewMatch4(t *testing.T) {
 		totalSell = totalSell.Add(a)
 
 		sells = append(sells, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.Decimal{},
 			Amount: a,
@@ -387,7 +379,6 @@ func TestNewMatch5(t *testing.T) {
 		totalBuy = totalBuy.Add(a)
 
 		buys = append(buys, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.Decimal{},
 			Amount: a,
@@ -403,7 +394,6 @@ func TestNewMatch5(t *testing.T) {
 		totalSell = totalSell.Add(a)
 
 		sells = append(sells, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: a,
@@ -475,7 +465,6 @@ func TestNewMatch6(t *testing.T) {
 		totalBuy = totalBuy.Add(a)
 
 		buys = append(buys, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: a,
@@ -490,7 +479,6 @@ func TestNewMatch6(t *testing.T) {
 		totalSell = totalSell.Add(a)
 
 		sells = append(sells, &Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: a,

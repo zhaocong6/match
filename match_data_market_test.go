@@ -17,7 +17,6 @@ func TestMarket(t *testing.T) {
 
 	for i := 0; i < num; i++ {
 		err := market.push(&Order{
-			ID:     uint64(i),
 			Symbol: sym,
 			Price:  decimal.NewFromFloat(rand.Float64()),
 			Amount: decimal.NewFromInt(int64(i)),
