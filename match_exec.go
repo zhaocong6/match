@@ -111,6 +111,11 @@ func (m *exec) matching() {
 }
 
 func (m *exec) matchHandle(buyOrder *Order, sellOrder *Order) {
+	defer func() {
+		//撮合成功 再次调度
+		m.dispatch.dispatch(m.symbol)
+	}()
+
 	//买价必须大于等于卖价
 	//否则投回队列
 	if !buyOrder.Price.GreaterThanOrEqual(sellOrder.Price) {
@@ -157,9 +162,6 @@ func (m *exec) matchHandle(buyOrder *Order, sellOrder *Order) {
 			market.push(matchOrder.surplus)
 		}
 	}
-
-	//撮合成功 再次调度
-	m.dispatch.dispatch(m.symbol)
 }
 
 //取消撮合
