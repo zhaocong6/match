@@ -84,10 +84,6 @@ func TestNewMatch1(t *testing.T) {
 			fmt.Printf("实际买量:%s 实际卖量:%s \r\n", finalBuy, finalSell)
 			fmt.Printf("实际买价:%s 实际卖价:%s \r\n", finalBuyPrice, finalSellPrice)
 
-			if !finalBuy.Equal(finalSell) {
-				t.Error(errors.New("实际买量和实际卖量不相等"))
-			}
-
 			if !finalBuyPrice.Equal(finalSellPrice) {
 				t.Error(t, errors.New("实际买价和实际卖价不相等"))
 			}
@@ -511,7 +507,7 @@ func TestNewMatch6(t *testing.T) {
 		case res := <-match.Read:
 			matchNum++
 			finalBuy = finalBuy.Add(res[0].Amount)
-			finalBuyPrice = finalBuyPrice.Add(res[0].Price.Mul(res[0].Amount))
+			finalBuyPrice = finalBuyPrice.Add(res[0].Amount)
 
 			finalSell = finalSell.Add(res[1].Amount)
 			finalSellPrice = finalSellPrice.Add(res[1].Price.Mul(res[1].Amount))

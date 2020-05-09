@@ -264,6 +264,8 @@ type matchOrder struct {
 //计算剩余订单
 //得到最终撮合量
 //计算多余撮合量
+//买是计价单位
+//卖是交易单位, 卖方价格需要 * 市场价
 //	买卖数量相等 没有多余撮合量
 //	买量大于卖量 买量-卖量 = 多余量
 //	买量小于卖量 卖量-买量 = 多余量
@@ -277,7 +279,23 @@ func calculateOrders(buyOrder Order, sellOrder Order, finalPrice decimal.Decimal
 	defer func() {
 		matchOrder.final[0].Price = finalPrice
 		matchOrder.final[1].Price = finalPrice
+
+		//卖方价格换算
+		//将卖方单位换算回以前
+		matchOrder.final[1].Amount = matchOrder.final[1].Amount.Div(finalPrice)
+
+		//验证是否是卖方
+		//将卖方单位换算回以前
+		if matchOrder.surplus != nil {
+			if matchOrder.surplus.Side == SELL {
+				matchOrder.surplus.Amount = matchOrder.surplus.Amount.Div(finalPrice)
+			}
+		}
 	}()
+
+	//卖方价格换算
+	//此时买卖方是一个单位
+	sellOrder.Amount = sellOrder.Amount.Mul(finalPrice)
 
 	//买卖数量相等
 	if buyOrder.Amount.Equal(sellOrder.Amount) {
