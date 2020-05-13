@@ -11,13 +11,21 @@ type cancelCh chan struct {
 
 type dispatcher struct {
 	sync.Mutex
-	ch      map[Symbol]chan struct{}
-	cancels map[Symbol]cancelCh
+	ch           map[Symbol]chan struct{}
+	cancels      map[Symbol]cancelCh
+	addOrCreates map[Symbol]chan struct {
+		order *Order
+		ch    chan struct{}
+	}
 }
 
 var dispatch = &dispatcher{
 	ch:      make(map[Symbol]chan struct{}),
 	cancels: make(map[Symbol]cancelCh),
+	addOrCreates: make(map[Symbol]chan struct {
+		order *Order
+		ch    chan struct{}
+	}),
 }
 
 //为每个币对
@@ -33,6 +41,11 @@ func (d *dispatcher) add(sym Symbol) {
 			ch    chan *Order
 		})
 
+		d.addOrCreates[sym] = make(chan struct {
+			order *Order
+			ch    chan struct{}
+		})
+
 		exec := newExec(sym, d)
 
 		go func() {
@@ -44,6 +57,9 @@ func (d *dispatcher) add(sym Symbol) {
 				//监听撮合调度
 				case <-d.ch[sym]:
 					exec.matching()
+				//增量或者创建
+				case addOrCreate := <-d.addOrCreates[sym]:
+					exec.addOrCreate(addOrCreate.order, addOrCreate.ch)
 				}
 			}
 		}()
@@ -59,6 +75,19 @@ func (d *dispatcher) cancel(order *Order) <-chan *Order {
 	d.cancels[order.Symbol] <- struct {
 		order *Order
 		ch    chan *Order
+	}{order: order, ch: ch}
+
+	return ch
+}
+
+func (d *dispatcher) addOrCreate(order *Order) <-chan struct{} {
+	d.add(order.Symbol)
+
+	ch := make(chan struct{})
+
+	d.addOrCreates[order.Symbol] <- struct {
+		order *Order
+		ch    chan struct{}
 	}{order: order, ch: ch}
 
 	return ch

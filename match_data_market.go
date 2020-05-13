@@ -76,3 +76,19 @@ func (m *marketer) del(order *Order) (*Order, error) {
 	}
 	return nil, NotExist("")
 }
+
+func (m *marketer) find(order *Order) (*Order, error) {
+	if order == nil {
+		return nil, DataNil("")
+	}
+
+	if mar, ok := m.symbols[order.Symbol]; ok {
+		switch order.Side {
+		case BUY:
+			return mar.buy.find(order), nil
+		case SELL:
+			return mar.sell.find(order), nil
+		}
+	}
+	return nil, NotExist("")
+}

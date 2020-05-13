@@ -182,6 +182,29 @@ func (m *exec) cancel(order *Order, ch chan *Order) {
 	}
 }
 
+func (m *exec) addOrCreate(order *Order, ch chan struct{}) {
+	addAmount := order.Amount
+
+	switch order.Type {
+	case LIMIT:
+		if order, err := book.find(order); err == nil {
+			order.Amount = order.Amount.Add(addAmount)
+		} else {
+			book.push(order)
+		}
+
+		ch <- struct{}{}
+	case MARKET:
+		if order, err := market.find(order); err == nil {
+			order.Amount = order.Amount.Add(addAmount)
+		} else {
+			market.push(order)
+		}
+
+		ch <- struct{}{}
+	}
+}
+
 const (
 	buyOrderNotNil = 2 << iota
 	buyOrderNil

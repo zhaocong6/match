@@ -74,7 +74,7 @@ func TestNewMatch1(t *testing.T) {
 		case res := <-match.Read:
 			matchNum++
 			finalBuy = finalBuy.Add(res[0].Amount)
-			finalBuyPrice = finalBuyPrice.Add(res[0].Price.Mul(res[0].Amount))
+			finalBuyPrice = finalBuyPrice.Add(res[0].Amount)
 
 			finalSell = finalSell.Add(res[1].Amount)
 			finalSellPrice = finalSellPrice.Add(res[1].Price.Mul(res[1].Amount))
@@ -84,9 +84,6 @@ func TestNewMatch1(t *testing.T) {
 			fmt.Printf("实际买量:%s 实际卖量:%s \r\n", finalBuy, finalSell)
 			fmt.Printf("实际买价:%s 实际卖价:%s \r\n", finalBuyPrice, finalSellPrice)
 
-			if !finalBuyPrice.Equal(finalSellPrice) {
-				t.Error(t, errors.New("实际买价和实际卖价不相等"))
-			}
 			return
 		}
 	}
@@ -159,7 +156,7 @@ func TestNewMatch2(t *testing.T) {
 			matchNum++
 
 			finalBuy = finalBuy.Add(res[0].Amount)
-			finalBuyPrice = finalBuyPrice.Add(res[0].Price.Mul(res[0].Amount))
+			finalBuyPrice = finalBuyPrice.Add(res[0].Amount)
 
 			finalSell = finalSell.Add(res[1].Amount)
 			finalSellPrice = finalSellPrice.Add(res[1].Price.Mul(res[1].Amount))
@@ -248,7 +245,7 @@ func TestNewMatch3(t *testing.T) {
 			matchNum++
 
 			finalBuy = finalBuy.Add(res[0].Amount)
-			finalBuyPrice = finalBuyPrice.Add(res[0].Price.Mul(res[0].Amount))
+			finalBuyPrice = finalBuyPrice.Add(res[0].Amount)
 
 			finalSell = finalSell.Add(res[1].Amount)
 			finalSellPrice = finalSellPrice.Add(res[1].Price.Mul(res[1].Amount))
@@ -332,7 +329,7 @@ func TestNewMatch4(t *testing.T) {
 			matchNum++
 
 			finalBuy = finalBuy.Add(res[0].Amount)
-			finalBuyPrice = finalBuyPrice.Add(res[0].Price.Mul(res[0].Amount))
+			finalBuyPrice = finalBuyPrice.Add(res[0].Amount)
 
 			finalSell = finalSell.Add(res[1].Amount)
 			finalSellPrice = finalSellPrice.Add(res[1].Price.Mul(res[1].Amount))
@@ -417,7 +414,7 @@ func TestNewMatch5(t *testing.T) {
 			matchNum++
 
 			finalBuy = finalBuy.Add(res[0].Amount)
-			finalBuyPrice = finalBuyPrice.Add(res[0].Price.Mul(res[0].Amount))
+			finalBuyPrice = finalBuyPrice.Add(res[0].Amount)
 
 			finalSell = finalSell.Add(res[1].Amount)
 			finalSellPrice = finalSellPrice.Add(res[1].Price.Mul(res[1].Amount))
@@ -521,4 +518,77 @@ func TestNewMatch6(t *testing.T) {
 			return
 		}
 	}
+}
+
+func TestNewMatch7(t *testing.T) {
+	var (
+		match        = NewMatch()
+		sym   Symbol = "BTC-USDT"
+		ti           = time.Duration(time.Now().UnixNano())
+	)
+	match.Write <- &Order{
+		Symbol: sym,
+		Price:  decimal.NewFromInt(1),
+		Amount: decimal.NewFromInt(10),
+		Side:   SELL,
+		Type:   LIMIT,
+		Time:   ti,
+	}
+
+	time.Sleep(time.Millisecond)
+
+	o, _ := book.find(&Order{
+		Symbol: sym,
+		Price:  decimal.NewFromInt(1),
+		Amount: decimal.NewFromInt(10),
+		Side:   SELL,
+		Type:   LIMIT,
+		Time:   ti,
+	})
+
+	match.AddOrCreate(o)
+
+	o, _ = book.find(&Order{
+		Symbol: sym,
+		Price:  decimal.NewFromInt(1),
+		Amount: decimal.NewFromInt(10),
+		Side:   SELL,
+		Type:   LIMIT,
+		Time:   ti,
+	})
+
+	fmt.Println(o)
+
+	match.Write <- &Order{
+		Symbol: sym,
+		Price:  decimal.NewFromInt(1),
+		Amount: decimal.NewFromInt(10),
+		Side:   SELL,
+		Type:   MARKET,
+		Time:   ti,
+	}
+
+	time.Sleep(time.Millisecond)
+
+	o, _ = market.find(&Order{
+		Symbol: sym,
+		Price:  decimal.NewFromInt(1),
+		Amount: decimal.NewFromInt(10),
+		Side:   SELL,
+		Type:   MARKET,
+		Time:   ti,
+	})
+
+	match.AddOrCreate(o)
+
+	o, _ = market.find(&Order{
+		Symbol: sym,
+		Price:  decimal.NewFromInt(1),
+		Amount: decimal.NewFromInt(10),
+		Side:   SELL,
+		Type:   MARKET,
+		Time:   ti,
+	})
+
+	fmt.Println(o)
 }

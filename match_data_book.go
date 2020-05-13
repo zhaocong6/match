@@ -90,3 +90,18 @@ func (b *bookBox) first(sym Symbol, side string) (Order, error) {
 
 	return Order{}, NotExist("")
 }
+
+func (b *bookBox) find(order *Order) (*Order, error) {
+	switch order.Side {
+	case BUY:
+		if buy, ok := b.buy[order.Symbol]; ok {
+			return buy.find(order), nil
+		}
+	case SELL:
+		if sell, ok := b.sell[order.Symbol]; ok {
+			return sell.find(order), nil
+		}
+	}
+
+	return nil, NotExist("")
+}

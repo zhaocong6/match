@@ -122,6 +122,21 @@ func (t *timeQueue) del(order *Order) *Order {
 	return nil
 }
 
+func (t *timeQueue) find(order *Order) *Order {
+	t.Lock()
+	defer t.Unlock()
+
+	i := t.tree.Get(&timeTree{
+		time: order.Time,
+	})
+
+	if data, ok := i.(*timeTree); ok {
+		return &data.order
+	}
+
+	return nil
+}
+
 //返回时间队列的剩余长度
 func (t *timeQueue) len() int {
 	return t.tree.Len()
@@ -205,6 +220,24 @@ func (q *buySellQueue) del(order *Order) *Order {
 		}
 
 		return t
+	}
+
+	return nil
+}
+
+func (q *buySellQueue) find(order *Order) *Order {
+	q.Lock()
+	defer q.Unlock()
+
+	i := q.tree.Get(&priceTree{
+		price: order.Price,
+	})
+
+	if tree, ok := i.(*priceTree); ok {
+		t := tree.queue.find(order)
+		if t != nil {
+			return t
+		}
 	}
 
 	return nil
@@ -378,8 +411,22 @@ func (m *marketQueue) del(order *Order) *Order {
 	i := m.tree.Delete(&timeTree{
 		time: order.Time,
 	})
-	if Order, ok := i.(*timeTree); ok {
-		return &Order.order
+	if order, ok := i.(*timeTree); ok {
+		return &order.order
+	}
+
+	return nil
+}
+
+func (m *marketQueue) find(order *Order) *Order {
+	m.Lock()
+	defer m.Unlock()
+
+	i := m.tree.Get(&timeTree{
+		time: order.Time,
+	})
+	if order, ok := i.(*timeTree); ok {
+		return &order.order
 	}
 
 	return nil

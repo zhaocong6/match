@@ -24,6 +24,15 @@ func (m *matcher) Cancel(order *Order) *Order {
 	return <-readCh
 }
 
+//增量或者创建
+func (m *matcher) AddOrCreate(order *Order) {
+	ch := dispatch.addOrCreate(order)
+	select {
+	case <-ch:
+		return
+	}
+}
+
 var match struct {
 	sync.Once
 	m *matcher
