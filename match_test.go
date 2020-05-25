@@ -592,3 +592,64 @@ func TestNewMatch7(t *testing.T) {
 
 	fmt.Println(o)
 }
+
+func TestGetDepth(t *testing.T) {
+	var (
+		num       = 10000
+		match     = NewMatch()
+		totalBuy  decimal.Decimal
+		totalSell decimal.Decimal
+		buys      []*Order
+		sells     []*Order
+
+		sym Symbol = "BTC-USDT"
+	)
+
+	for i := 0; i < num; i++ {
+		rand.Seed(time.Now().UnixNano())
+		a := decimal.NewFromFloat(rand.Float64())
+		totalBuy = totalBuy.Add(a)
+
+		buys = append(buys, &Order{
+			Symbol: sym,
+			Price:  decimal.NewFromFloat(rand.Float64()),
+			Amount: a,
+			Side:   BUY,
+			Type:   LIMIT,
+			Time:   time.Duration(time.Now().UnixNano()),
+		})
+	}
+	for i := 0; i < num; i++ {
+		rand.Seed(time.Now().UnixNano())
+		a := decimal.NewFromFloat(rand.Float64())
+		totalSell = totalSell.Add(a)
+
+		sells = append(sells, &Order{
+			Symbol: sym,
+			Price:  decimal.NewFromFloat(rand.Float64()),
+			Amount: a,
+			Side:   SELL,
+			Type:   LIMIT,
+			Time:   time.Duration(time.Now().UnixNano()),
+		})
+	}
+
+	go func() {
+		for _, buy := range buys {
+			match.Write <- buy
+		}
+	}()
+
+	go func() {
+		for _, sell := range sells {
+			match.Write <- sell
+		}
+	}()
+
+	time.Sleep(time.Millisecond * 10)
+
+	depth := match.GetDepth(sym, 10)
+	fmt.Println(depth[0])
+	fmt.Println(depth[1])
+}
+
