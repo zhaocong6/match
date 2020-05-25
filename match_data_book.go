@@ -105,3 +105,20 @@ func (b *bookBox) find(order *Order) (*Order, error) {
 
 	return nil, NotExist("")
 }
+
+func (b *bookBox) getDepth(sym Symbol, side string, depth int) []Order {
+	var res []Order
+
+	switch side {
+	case BUY:
+		if buy, ok := b.buy[sym]; ok {
+			res = buy.getDepth(depth)
+		}
+	case SELL:
+		if sell, ok := b.sell[sym]; ok {
+			res = sell.getDepth(depth)
+		}
+	}
+
+	return res
+}

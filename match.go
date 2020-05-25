@@ -33,6 +33,14 @@ func (m *matcher) AddOrCreate(order *Order) {
 	}
 }
 
+func (m *matcher) GetDepth(symbol Symbol, depth int) [2][]Order {
+	var res [2][]Order
+
+	res[0] = book.getDepth(symbol, BUY, depth)
+	res[1] = book.getDepth(symbol, SELL, depth)
+	return res
+}
+
 var match struct {
 	sync.Once
 	m *matcher
