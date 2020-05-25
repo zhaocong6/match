@@ -297,6 +297,45 @@ func (q *buyQueue) first() (Order, error) {
 	return Order{}, NotExist("")
 }
 
+//获取实时深度
+func (q *buyQueue) getDepth(depth int) []Order {
+	var (
+		num       int
+		res       []Order
+		condition = true
+	)
+
+	q.tree.Descend(func(i btree.Item) bool {
+
+		if tree, ok := i.(*priceTree); ok {
+
+			tree.queue.tree.Ascend(func(i btree.Item) bool {
+				defer func() {
+					num++
+				}()
+
+				if num >= depth {
+					condition = false
+					return false
+				}
+
+				if data, ok := i.(*timeTree); ok {
+					res = append(res, data.order)
+				}
+				return true
+			})
+
+			if condition == false {
+				return false
+			}
+		}
+
+		return true
+	})
+
+	return res
+}
+
 type sellQueue struct {
 	*buySellQueue
 }
@@ -348,6 +387,45 @@ func (q *sellQueue) first() (Order, error) {
 
 	return Order{}, NotExist("")
 }
+
+func (q *sellQueue) getDepth(depth int) []Order {
+	var (
+		num       int
+		res       []Order
+		condition = true
+	)
+
+	q.tree.Ascend(func(i btree.Item) bool {
+
+		if tree, ok := i.(*priceTree); ok {
+
+			tree.queue.tree.Ascend(func(i btree.Item) bool {
+				defer func() {
+					num++
+				}()
+
+				if num >= depth {
+					condition = false
+					return false
+				}
+
+				if data, ok := i.(*timeTree); ok {
+					res = append(res, data.order)
+				}
+				return true
+			})
+
+			if condition == false {
+				return false
+			}
+		}
+
+		return true
+	})
+
+	return res
+}
+
 
 //市价队列
 type marketQueue struct {
