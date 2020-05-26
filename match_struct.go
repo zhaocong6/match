@@ -389,6 +389,9 @@ func (q *sellQueue) first() (Order, error) {
 }
 
 func (q *sellQueue) getDepth(depth int) []Order {
+	q.Lock()
+	defer q.Unlock()
+
 	var (
 		num       int
 		res       []Order
