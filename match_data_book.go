@@ -95,11 +95,17 @@ func (b *bookBox) find(order *Order) (*Order, error) {
 	switch order.Side {
 	case BUY:
 		if buy, ok := b.buy[order.Symbol]; ok {
-			return buy.find(order), nil
+			order := buy.find(order)
+			if order != nil {
+				return order, nil
+			}
 		}
 	case SELL:
 		if sell, ok := b.sell[order.Symbol]; ok {
-			return sell.find(order), nil
+			order := sell.find(order)
+			if order != nil {
+				return order, nil
+			}
 		}
 	}
 
