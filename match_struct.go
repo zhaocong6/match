@@ -23,13 +23,13 @@ type Symbol string
 
 //撮合订单
 type Order struct {
-	ID     string
-	Symbol Symbol
-	Price  decimal.Decimal
-	Amount decimal.Decimal
-	Side   string
-	Type   string
-	Time   time.Duration
+	ID     string          `json:"id"`
+	Symbol Symbol          `json:"symbol"`
+	Price  decimal.Decimal `json:"price"`
+	Amount decimal.Decimal `json:"amount"`
+	Side   string          `json:"side"`
+	Type   string          `json:"type"`
+	Time   time.Duration   `json:"time"`
 }
 
 //时间树
