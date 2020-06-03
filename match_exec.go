@@ -183,26 +183,26 @@ func (m *exec) cancel(order *Order, ch chan *Order) {
 }
 
 func (m *exec) addOrCreate(order *Order, ch chan struct{}) {
-	addAmount := order.Amount
+	defer func() {
+		dispatch.dispatch(order.Symbol)
+	}()
 
 	switch order.Type {
 	case LIMIT:
-		if order, err := book.find(order); err == nil {
-			order.Amount = order.Amount.Add(addAmount)
+		if o, _ := book.find(order); o != nil {
+			o.Amount = o.Amount.Add(order.Amount)
 		} else {
 			book.push(order)
 		}
-
-		ch <- struct{}{}
 	case MARKET:
-		if order, err := market.find(order); err == nil {
-			order.Amount = order.Amount.Add(addAmount)
+		if o, _ := market.find(order); o != nil {
+			o.Amount = o.Amount.Add(order.Amount)
 		} else {
 			market.push(order)
 		}
-
-		ch <- struct{}{}
 	}
+
+	ch <- struct{}{}
 }
 
 const (
