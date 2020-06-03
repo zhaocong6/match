@@ -299,6 +299,9 @@ func (q *buyQueue) first() (Order, error) {
 
 //获取实时深度
 func (q *buyQueue) getDepth(depth int) []Order {
+	q.Lock()
+	defer q.Unlock()
+
 	var (
 		num       int
 		res       []Order
