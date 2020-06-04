@@ -653,3 +653,91 @@ func TestGetDepth(t *testing.T) {
 	fmt.Println(depth[1])
 }
 
+func TestNewMatch8(t *testing.T) {
+	var (
+		num       = 10000
+		matchNum  = 0
+		match     = NewMatch()
+		totalBuy  decimal.Decimal
+		totalSell decimal.Decimal
+		buys      []*Order
+		sells     []*Order
+
+		sym Symbol = "BTC-USDT"
+
+		finalBuy       decimal.Decimal
+		finalSell      decimal.Decimal
+		finalBuyPrice  decimal.Decimal
+		finalSellPrice decimal.Decimal
+	)
+
+	for i := 0; i < num; i++ {
+		rand.Seed(time.Now().UnixNano())
+		a := decimal.NewFromFloat(rand.Float64())
+		totalBuy = totalBuy.Add(a)
+
+		var t string
+		if rand.Intn(3) > 1 {
+			t = MARKET
+		} else {
+			t = LIMIT
+		}
+
+		buys = append(buys, &Order{
+			Symbol: sym,
+			Price:  decimal.Decimal{},
+			Amount: a,
+			Side:   BUY,
+			Type:   t,
+			Time:   time.Duration(time.Now().UnixNano()),
+		})
+	}
+
+	for i := 0; i < num; i++ {
+		rand.Seed(time.Now().UnixNano())
+		a := decimal.NewFromFloat(rand.Float64())
+		totalSell = totalSell.Add(a)
+
+		sells = append(sells, &Order{
+			Symbol: sym,
+			Price:  decimal.NewFromFloat(rand.Float64()),
+			Amount: a,
+			Side:   SELL,
+			Type:   LIMIT,
+			Time:   time.Duration(time.Now().UnixNano()),
+		})
+	}
+
+	go func() {
+		for _, buy := range buys {
+			match.Write <- buy
+		}
+	}()
+
+	go func() {
+		for _, sell := range sells {
+			match.Write <- sell
+		}
+	}()
+
+	for {
+		select {
+		case res := <-match.Read:
+			matchNum++
+
+			finalBuy = finalBuy.Add(res[0].Amount)
+			finalBuyPrice = finalBuyPrice.Add(res[0].Amount)
+
+			finalSell = finalSell.Add(res[1].Amount)
+			finalSellPrice = finalSellPrice.Add(res[1].Price.Mul(res[1].Amount))
+
+		case <-time.After(time.Second * 1):
+			fmt.Printf("总数据:%d 撮合次数:%d \r\n", num*2, matchNum)
+			fmt.Printf("总买量:%s 总卖量:%s \r\n", totalBuy, totalSell)
+			fmt.Printf("实际买量:%s 实际卖量:%s \r\n", finalBuy, finalSell)
+			fmt.Printf("实际买价:%s 实际卖价:%s \r\n", finalBuyPrice, finalSellPrice)
+			fmt.Println(GetGuidePrice(sym))
+			return
+		}
+	}
+}

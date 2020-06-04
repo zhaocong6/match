@@ -20,12 +20,15 @@ func newExec(sym Symbol, d *dispatcher) *exec {
 //撮合
 //在同一币对中是串行化
 func (m *exec) matching() {
+	//取出最佳的挂单
 	buyOrder := book.pop(m.symbol, BUY)
 	sellOrder := book.pop(m.symbol, SELL)
 
+	//取出最佳的市价单
 	buyMarket := market.pop(m.symbol, BUY)
 	sellMarket := market.pop(m.symbol, SELL)
 
+	//取出上一次成交价
 	guidePrice := GetGuidePrice(m.symbol)
 
 	bit := &bitmapper{
@@ -46,28 +49,32 @@ func (m *exec) matching() {
 		return
 	}
 
-	//市价买不为空
-	//账单卖不为空
-	if bit.bitmapIs(buyMarketNotNil) && bit.bitmapIs(sellOrderNotNil) {
-		buyMarket.Price = sellOrder.Price
-	} else if bit.bitmapIs(buyMarketNotNil) && bit.bitmapIs(sellOrderNil) && bit.bitmapIs(guidePriceNotZero) {
+	//双方都有市价
+	if bit.bitmapIs(buyMarketNotNil | sellMarketNotNil | buyOrderNotNil | sellOrderNotNil) {
+		p, _ := calculationFinalPrice(buyOrder, sellOrder)
+		buyMarket.Price = p
+		sellMarket.Price = p
+	} else {
 		//市价买不为空
-		//账单卖为空
-		//上一次价格不为0
-		buyMarket.Price = GetGuidePrice(buyMarket.Symbol)
+		//账单卖不为空
+		if bit.bitmapIs(buyMarketNotNil) && bit.bitmapIs(sellOrderNotNil) {
+			buyMarket.Price = sellOrder.Price
+		} else if bit.bitmapIs(buyMarketNotNil) {
+			//市价买不为空
+			buyMarket.Price = guidePrice
+		}
+
+		//市价卖不为空
+		//账单买不为空
+		//fmt.Println(sellMarket, buyOrder)
+		if bit.bitmapIs(sellMarketNotNil) && bit.bitmapIs(buyOrderNotNil) {
+			sellMarket.Price = buyOrder.Price
+		} else if bit.bitmapIs(sellMarketNotNil) {
+			//市价卖不为空
+			sellMarket.Price = guidePrice
+		}
 	}
 
-	//市价卖不为空
-	//账单买不为空
-	//fmt.Println(sellMarket, buyOrder)
-	if bit.bitmapIs(sellMarketNotNil) && bit.bitmapIs(buyOrderNotNil) {
-		sellMarket.Price = buyOrder.Price
-	} else if bit.bitmapIs(sellMarketNotNil) && bit.bitmapIs(buyOrderNil) && bit.bitmapIs(guidePriceNotZero) {
-		//市价卖不为空
-		//账单买为空
-		//上一次价格不为0
-		sellMarket.Price = GetGuidePrice(sellMarket.Symbol)
-	}
 	book.push(buyOrder)
 	book.push(sellOrder)
 	book.push(buyMarket)
